@@ -35,9 +35,6 @@
     "phpunit/phpunit": "^9.0"
   },
   "autoload": {
-    "files": [
-      "src/helpers.php"
-    ],
     "psr-4": {
       "Pollen\\WpPost\\": "src"
     }
