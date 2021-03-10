@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pollen\WpPost;
 
+use Pollen\Pagination\Adapters\WpQueryPaginatorInterface;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBagInterface;
 use Pollen\WpTaxonomy\WpTermQueryInterface;
@@ -148,6 +149,13 @@ interface WpPostQueryInterface extends ParamsBagInterface
      * @return bool
      */
     public static function is($instance): bool;
+
+    /**
+     * Récupération de l'instance de pagination de la dernière requête de récupération d'une liste d'éléments.
+     *
+     * @return WpQueryPaginatorInterface
+     */
+    public static function paginator(): WpQueryPaginatorInterface;
 
     /**
      * Traitement d'arguments de requête de récupération des éléments.
