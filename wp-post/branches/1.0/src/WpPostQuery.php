@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pollen\WpPost;
 
+use Pollen\Pagination\Adapters\WpQueryPaginator;
+use Pollen\Pagination\Adapters\WpQueryPaginatorInterface;
 use Pollen\Support\Arr;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBag;
@@ -62,6 +64,12 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     protected static $fallbackClass;
 
     /**
+     * Instance de pagination de la dernière requête de récupération d'une liste d'éléments
+     * @var WpQueryPaginatorInterface|null
+     */
+    protected static $paginator;
+
+    /**
      * Nom de qualification du type de post ou liste de types de post associés.
      * @var string|string[]|null
      */
@@ -92,6 +100,7 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
             $this->set($this->wpPost->to_array());
             $this->parse();
         }
+        parent::__construct();
     }
 
     /**
@@ -165,7 +174,7 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     {
         $wpQuery = new WP_Query(static::parseQueryArgs(['name' => $post_name]));
 
-        return ($wpQuery->found_posts == 1) ? static::createFromId(current($wpQuery->posts)->ID ?? 0) : null;
+        return (1 === (int)$wpQuery->found_posts) ? static::createFromId(current($wpQuery->posts)->ID ?? 0) : null;
     }
 
     /**
@@ -230,7 +239,6 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     public static function fetchFromWpQuery(WP_Query $wp_query): array
     {
         $wp_posts = $wp_query->posts ?? [];
-
         $results = [];
         foreach ($wp_posts as $wp_post) {
             if (!$instance = static::createFromId($wp_post->ID)) {
@@ -246,6 +254,8 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
             }
         }
 
+        static::$paginator = new WpQueryPaginator($wp_query);
+
         return $results;
     }
 
@@ -256,6 +266,18 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     {
         return $instance instanceof static &&
             ((($postType = static::$postType) && ($postType !== 'any')) ? $instance->typeIn($postType) : true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function paginator(): WpQueryPaginatorInterface
+    {
+        if (static::$paginator === null) {
+            static::$paginator = new WpQueryPaginator();
+        }
+
+        return static::$paginator;
     }
 
     /**
@@ -428,7 +450,10 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
             $excerpt = wp_trim_words($text, $excerpt_length, $excerpt_more);
         }
 
-        return $raw ? $excerpt : ($excerpt ? (string)apply_filters('get_the_excerpt', $excerpt) : '');
+        if ($raw) {
+            return $excerpt;
+        }
+        return $excerpt ? (string)apply_filters('get_the_excerpt', $excerpt) : '';
     }
 
     /**
