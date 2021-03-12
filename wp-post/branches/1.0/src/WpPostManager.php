@@ -72,15 +72,8 @@ class WpPostManager implements WpPostManagerInterface
     public function boot(): WpPostManagerInterface
     {
         if (!$this->isBooted()) {
-
             add_action('init', function () {
                 global $wp_post_types;
-
-                foreach ($wp_post_types as $name => $attrs) {
-                    if (!$this->getType($name)) {
-                        $this->registerType($name, get_object_vars($attrs));
-                    }
-                }
 
                 foreach ($this->postTypes as $name => $postType) {
                     if (!isset($wp_post_types[$name])) {
@@ -95,6 +88,16 @@ class WpPostManager implements WpPostManagerInterface
                         foreach ($taxonomies as $taxonomy) {
                             register_taxonomy_for_object_type($taxonomy, $postType->getName());
                         }
+                    }
+                }
+            }, 11);
+
+            add_action('init', function () {
+                global $wp_post_types;
+
+                foreach ($wp_post_types as $name => $attrs) {
+                    if (!$this->getType($name)) {
+                        $this->registerType($name, get_object_vars($attrs));
                     }
                 }
             }, 999999);
