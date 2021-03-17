@@ -512,6 +512,13 @@ interface WpPostQueryInterface extends ParamsBagInterface
     public function getWpPost(): ?WP_Post;
 
     /**
+     * Récupération de l'instance du type de post.
+     *
+     * @return WpPostTypeInterface
+     */
+    public function getWpPostType(): WpPostTypeInterface;
+
+    /**
      * Vérifie le balisage de suite de lecture est actif.
      *
      * @return bool

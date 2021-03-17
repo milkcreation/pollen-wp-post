@@ -45,6 +45,8 @@ use WP_Term_Query;
  */
 class WpPostQuery extends ParamsBag implements WpPostQueryInterface
 {
+    use WpPostProxy;
+
     /**
      * Liste des classes de rappel d'instanciation selon le type de post.
      * @var string[][]|array
@@ -677,6 +679,14 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     public function getWpPost(): ?WP_Post
     {
         return $this->wpPost;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getWpPostType(): WpPostTypeInterface
+    {
+        return $this->wpPost()->getType($this->getType());
     }
 
     /**
