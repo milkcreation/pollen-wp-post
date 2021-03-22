@@ -603,6 +603,14 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     /**
      * @inheritDoc
      */
+    public function getShortLink(): string
+    {
+        return wp_get_shortlink($this->getId());
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getSlug(): string
     {
         return (string)$this->get('post_name');
