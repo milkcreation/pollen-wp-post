@@ -398,6 +398,13 @@ interface WpPostQueryInterface extends ParamsBagInterface
     public function getPath(): string;
 
     /**
+     * Récupération du permalien d'affichage du post dans l'interface utilisateur.
+     *
+     * @return string
+     */
+    public function getPermalink(): string;
+
+    /**
      * Récupération de l'instance de l'auteur associé.
      *
      * @return WpUserQueryInterface|null
@@ -422,11 +429,11 @@ interface WpPostQueryInterface extends ParamsBagInterface
     public function getQueriedTerms($taxonomy, array $args = []): array;
 
     /**
-     * Récupération du permalien d'affichage du post dans l'interface utilisateur.
+     * Récupération du permalien court d'affichage du post dans l'interface utilisateur.
      *
      * @return string
      */
-    public function getPermalink(): string;
+    public function getShortLink(): string;
 
     /**
      * Récupération de l'identifiant de qualification Wordpress (post_name).
