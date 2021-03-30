@@ -145,8 +145,10 @@ class WpPostManager implements WpPostManagerInterface
      */
     public function registerType(string $name, $args = []): WpPostTypeInterface
     {
-        $factory = $args instanceof WpPostTypeInterface ? $args : new WpPostType($name, $args);
+        $this->postTypes[$name] = $args instanceof WpPostTypeInterface ? $args : new WpPostType($name, $args);
+        $this->postTypes[$name]->setWpPostManager($this);
 
-        return $this->postTypes[$name] = $factory->setWpPostManager($this)->boot();
+
+        return $this->postTypes[$name]->boot();
     }
 }

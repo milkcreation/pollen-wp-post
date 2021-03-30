@@ -6,6 +6,8 @@ namespace Pollen\WpPost;
 
 use Psr\Container\ContainerInterface as Container;
 use RuntimeException;
+use WP_Query;
+use WP_Post;
 
 /**
  * @see \Pollen\WpPost\WpPostProxyInterface
@@ -21,9 +23,11 @@ trait WpPostProxy
     /**
      * Instance du gestionnaire de posts Wordpress.
      *
-     * @return WpPostManagerInterface
+     * @param true|string|int|WP_Post|WP_Query|array|null $query
+     *
+     * @return WpPostManagerInterface|WpPostQueryInterface|WpPostQueryInterface[]|array
      */
-    public function wpPost(): WpPostManagerInterface
+    public function wpPost($query = null)
     {
         if ($this->wpPostManager === null) {
             $container = method_exists($this, 'getContainer') ? $this->getContainer() : null;
@@ -39,7 +43,25 @@ trait WpPostProxy
             }
         }
 
-        return $this->wpPostManager;
+        if ($query === null) {
+            return $this->wpPostManager;
+        }
+
+        if (is_array($query) || ($query instanceof WP_Query)) {
+            return $this->wpPostManager->posts($query);
+        }
+
+        if ($query === true) {
+            $query = null;
+
+            global $wp_query;
+
+            if ($wp_query && !$wp_query->is_singular) {
+                return $this->wpPostManager->posts();
+            }
+        }
+
+        return $this->wpPostManager->post($query);
     }
 
     /**
@@ -47,12 +69,10 @@ trait WpPostProxy
      *
      * @param WpPostManagerInterface $wpPostManager
      *
-     * @return static
+     * @return void
      */
-    public function setWpPostManager(WpPostManagerInterface $wpPostManager): self
+    public function setWpPostManager(WpPostManagerInterface $wpPostManager): void
     {
         $this->wpPostManager = $wpPostManager;
-
-        return $this;
     }
 }
