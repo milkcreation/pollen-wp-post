@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Pollen\WpPost;
 
-use Psr\Container\ContainerInterface as Container;
+use InvalidArgumentException;
+use Pollen\Support\StaticProxy;
 use RuntimeException;
 use WP_Query;
 use WP_Post;
@@ -30,16 +31,14 @@ trait WpPostProxy
     public function wpPost($query = null)
     {
         if ($this->wpPostManager === null) {
-            $container = method_exists($this, 'getContainer') ? $this->getContainer() : null;
-
-            if ($container instanceof Container && $container->has(WpPostManagerInterface::class)) {
-                $this->wpPostManager = $container->get(WpPostManagerInterface::class);
-            } else {
-                try {
-                    $this->wpPostManager = WpPostManager::getInstance();
-                } catch(RuntimeException $e) {
-                    $this->wpPostManager = new WpPostManager();
-                }
+            try {
+                $this->wpPostManager = WpPostManager::getInstance();
+            } catch (RuntimeException $e) {
+                $this->wpPostManager = StaticProxy::getProxyInstance(
+                    WpPostManagerInterface::class,
+                    WpPostManager::class,
+                    method_exists($this, 'getContainer') ? $this->getContainer() : null
+                );
             }
         }
 
@@ -61,7 +60,11 @@ trait WpPostProxy
             }
         }
 
-        return $this->wpPostManager->post($query);
+        if ($post = $this->wpPostManager->post($query)) {
+            return $post;
+        }
+
+        throw new InvalidArgumentException('WpPostQueried is unavailable');
     }
 
     /**
