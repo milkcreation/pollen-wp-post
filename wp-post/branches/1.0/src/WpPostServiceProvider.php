@@ -13,7 +13,6 @@ class WpPostServiceProvider extends BaseServiceProvider
      */
     protected $provides = [
         WpPostManagerInterface::class,
-        WpPostHookerInterface::class
     ];
 
     /**
@@ -23,10 +22,6 @@ class WpPostServiceProvider extends BaseServiceProvider
     {
         $this->getContainer()->share(WpPostManagerInterface::class, function() {
             return new WpPostManager([], $this->getContainer());
-        });
-
-        $this->getContainer()->share(WpPostHookerInterface::class, function() {
-            return new WpPostHooker([], $this->getContainer()->get(WpPostManagerInterface::class));
         });
     }
 }
