@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Pollen\WpPost;
 
-use InvalidArgumentException;
+use Pollen\Support\Exception\ProxyInvalidArgumentException;
 use Pollen\Support\StaticProxy;
 use RuntimeException;
 use WP_Query;
@@ -64,7 +64,7 @@ trait WpPostProxy
             return $post;
         }
 
-        throw new InvalidArgumentException('WpPostQueried is unavailable');
+        throw new ProxyInvalidArgumentException('WpPostQueried is unavailable');
     }
 
     /**
