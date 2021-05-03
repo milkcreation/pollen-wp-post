@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pollen\WpPost;
 
 use Pollen\Support\Exception\ProxyInvalidArgumentException;
-use Pollen\Support\StaticProxy;
+use Pollen\Support\ProxyResolver;
 use RuntimeException;
 use WP_Query;
 use WP_Post;
@@ -34,7 +34,7 @@ trait WpPostProxy
             try {
                 $this->wpPostManager = WpPostManager::getInstance();
             } catch (RuntimeException $e) {
-                $this->wpPostManager = StaticProxy::getProxyInstance(
+                $this->wpPostManager = ProxyResolver::getInstance(
                     WpPostManagerInterface::class,
                     WpPostManager::class,
                     method_exists($this, 'getContainer') ? $this->getContainer() : null
