@@ -11,6 +11,8 @@ use WP_Post_Type;
 use WP_REST_Controller;
 
 /**
+ * @see https://developer.wordpress.org/reference/functions/register_post_type/
+ *
  * @property-read string $label
  * @property-read object $labels
  * @property-read string $description
@@ -49,12 +51,6 @@ class WpPostType implements WpPostTypeInterface
     use WpPostProxy;
 
     /**
-     * Indicateur d'instanciation.
-     * @var boolean
-     */
-    private $prepared = false;
-
-    /**
      * Instance du gestionnaire d'intitulés.
      * @var LabelsBag|null
      */
@@ -90,12 +86,13 @@ class WpPostType implements WpPostTypeInterface
     public function boot(): WpPostTypeInterface
     {
         if (!$this->isBooted()) {
-            //events()->trigger('post-type.factory.booting', [&$this]);
+            //events()->trigger('wp-post.post-type.booting', [&$this]);
 
             $this->parseParams();
 
             $this->setBooted();
-            //events()->trigger('post-type.factory.booted', [&$this]);
+
+            //events()->trigger('wp-post.post-type.booting', [&$this]);
         }
 
         return $this;
@@ -110,7 +107,7 @@ class WpPostType implements WpPostTypeInterface
      */
     public function __get($key)
     {
-        return $this->wpPost->{$key} ?? null;
+        return $this->wpPostType->{$key} ?? null;
     }
 
     /**
@@ -123,7 +120,7 @@ class WpPostType implements WpPostTypeInterface
      */
     public function __isset($key): bool
     {
-        return isset($this->wpPost->{$key});
+        return isset($this->wpPostType->{$key});
     }
 
     /**
@@ -223,7 +220,7 @@ class WpPostType implements WpPostTypeInterface
             $this->params(['labels' => get_object_vars($labels)]);
         }
 
-        $this->params(['label' => $this->params('label', _x($this->getName(), 'post type general name', 'tify'))]);
+        $this->params(['label' => $this->params('label', $this->getName())]);
 
         $this->params(['plural' => $this->params('plural', $this->params('labels.name', $this->params('label')))]);
 

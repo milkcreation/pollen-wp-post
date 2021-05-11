@@ -21,20 +21,13 @@ interface WpPostManagerInterface extends BootableTraitInterface, ConfigBagAwareT
     public function boot(): WpPostManagerInterface;
 
     /**
-     * Récupération d'une instance de type de post.
+     * Liste des instances de posts courants ou associés à une requête WP_Query ou associés à une liste d'arguments.
      *
-     * @param string $name Nom de qualification du type de post.
+     * @param WP_Query|array|null $query
      *
-     * @return WpPostTypeInterface|null
+     * @return WpPostQueryInterface[]|array
      */
-    public function getType(string $name): ?WpPostTypeInterface;
-
-    /**
-     * Récupération de l'instance de pagination de la dernière requête de récupération d'une liste d'éléments.
-     *
-     * @return WpQueryPaginatorInterface
-     */
-    public function paginator(): ?WpQueryPaginatorInterface;
+    public function fetch($query = null): array;
 
     /**
      * Instance du post courant ou associé à une définition.
@@ -43,24 +36,38 @@ interface WpPostManagerInterface extends BootableTraitInterface, ConfigBagAwareT
      *
      * @return WpPostQueryInterface|null
      */
-    public function post($post = null): ?WpPostQueryInterface;
+    public function get($post = null): ?WpPostQueryInterface;
 
     /**
-     * Liste des instances de posts courants ou associés à une requête WP_Query ou associés à une liste d'arguments.
+     * Récupération d'une instance de type de post.
      *
-     * @param WP_Query|array|null $query
+     * @param string $name
      *
-     * @return WpPostQueryInterface[]|array
+     * @return WpPostTypeInterface|null
      */
-    public function posts($query = null): array;
+    public function getType(string $name): ?WpPostTypeInterface;
+
+    /**
+     * Récupération de l'instance de pagination de la dernière requête de récupération d'une liste d'éléments.
+     *
+     * @return WpQueryPaginatorInterface|null
+     */
+    public function paginator(): ?WpQueryPaginatorInterface;
+
+    /**
+     * Instance du gestionnaire de type de post.
+     *
+     * @return WpPostTypeManagerInterface
+     */
+    public function postTypeManager(): WpPostTypeManagerInterface;
 
     /**
      * Déclaration d'un type de post.
      *
-     * @param string $name Nom de qualification du type de post.
-     * @param array|WpPostTypeInterface $args Liste des arguments de configuration.
+     * @param string $name
+     * @param array|WpPostTypeInterface $postTypeDef
      *
      * @return WpPostTypeInterface|null
      */
-    public function registerType(string $name, $args = []): ?WpPostTypeInterface;
+    public function registerType(string $name, $postTypeDef = []): ?WpPostTypeInterface;
 }

@@ -83,7 +83,7 @@ interface WpPostTypeInterface extends BootableTraitInterface, ParamsBagAwareTrai
     public function supports(string $feature): bool;
 
     /**
-     * Définition de l'instance de la taxonomie Wordpress associée.
+     * Définition de l'instance du type de post Wordpress associée.
      *
      * @param WP_Post_Type $post_type
      *
