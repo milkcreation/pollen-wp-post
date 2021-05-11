@@ -30,7 +30,7 @@
     "pollen-solutions/pagination": "^1.0",
     "pollen-solutions/support": "^1.0",
     "pollen-solutions/translation": "^1.0",
-    "pollen-solutions/wp-taxonomy": "^1.0",
+    "pollen-solutions/wp-term": "^1.0",
     "pollen-solutions/wp-user": "^1.0"
   },
   "require-dev": {
