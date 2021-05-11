@@ -25,10 +25,10 @@ class WpPostManager implements WpPostManagerInterface
     private static $instance;
 
     /**
-     * Liste des instances de type de post déclarée.
-     * @var WpPostTypeInterface[]|array
+     * Instances du gestionnaire de type de posts.
+     * @var WpPostTypeManagerInterface
      */
-    protected $postTypes = [];
+    protected $postTypeManager;
 
     /**
      * @param array $config
@@ -75,7 +75,7 @@ class WpPostManager implements WpPostManagerInterface
             add_action('init', function () {
                 global $wp_post_types;
 
-                foreach ($this->postTypes as $name => $postType) {
+                foreach ($this->postTypeManager()->all() as $name => $postType) {
                     if (!isset($wp_post_types[$name])) {
                         register_post_type($name, $postType->params()->all());
                     }
@@ -111,9 +111,25 @@ class WpPostManager implements WpPostManagerInterface
     /**
      * @inheritDoc
      */
+    public function fetch($query = null): array
+    {
+        return WpPostQuery::fetch($query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get($post = null): ?WpPostQueryInterface
+    {
+        return WpPostQuery::create($post);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getType(string $name): ?WpPostTypeInterface
     {
-        return $this->postTypes[$name] ?? null;
+        return $this->postTypeManager()->get($name);
     }
 
     /**
@@ -127,28 +143,20 @@ class WpPostManager implements WpPostManagerInterface
     /**
      * @inheritDoc
      */
-    public function post($post = null): ?WpPostQueryInterface
+    public function postTypeManager(): WpPostTypeManagerInterface
     {
-        return WpPostQuery::create($post);
+        if ($this->postTypeManager === null) {
+            $this->postTypeManager = $this->containerHas(WpPostTypeManagerInterface::class)
+                ? $this->containerGet(WpPostTypeManagerInterface::class) : new WpPostTypeManager($this);
+        }
+        return $this->postTypeManager;
     }
 
     /**
      * @inheritDoc
      */
-    public function posts($query = null): array
+    public function registerType(string $name, $postTypeDef = []): WpPostTypeInterface
     {
-        return WpPostQuery::fetch($query);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function registerType(string $name, $args = []): WpPostTypeInterface
-    {
-        $this->postTypes[$name] = $args instanceof WpPostTypeInterface ? $args : new WpPostType($name, $args);
-        $this->postTypes[$name]->setWpPostManager($this);
-
-
-        return $this->postTypes[$name]->boot();
+        return $this->postTypeManager()->register($name, $postTypeDef);
     }
 }

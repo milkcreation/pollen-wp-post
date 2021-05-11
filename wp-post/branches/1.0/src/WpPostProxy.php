@@ -56,11 +56,11 @@ trait WpPostProxy
             global $wp_query;
 
             if ($wp_query && !$wp_query->is_singular) {
-                return $this->wpPostManager->posts();
+                return $this->wpPostManager->fetch();
             }
         }
 
-        if ($post = $this->wpPostManager->post($query)) {
+        if ($post = $this->wpPostManager->get($query)) {
             return $post;
         }
 

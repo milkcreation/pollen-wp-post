@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pollen\WpPost;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Pollen\Pagination\Adapters\WpQueryPaginator;
 use Pollen\Pagination\Adapters\WpQueryPaginatorInterface;
 use Pollen\Support\Arr;
@@ -148,6 +150,14 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     /**
      * @inheritDoc
      */
+    public static function createFromEloquent(EloquentModel $model): ?WpPostQueryInterface
+    {
+        return static::createFromId((new WP_Post((object)$model->getAttributes()))->ID ?: 0);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function createFromGlobal(): ?WpPostQueryInterface
     {
         global $post;
@@ -215,6 +225,21 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     /**
      * @inheritDoc
      */
+    public static function fetchFromEloquent(EloquentCollection $collection): array
+    {
+        $instances = [];
+        foreach ($collection->toArray() as $item) {
+            if ($instance = static::createFromId((new WP_Post((object)$item))->ID ?: 0)) {
+                $instances[] = $instance;
+            }
+        }
+
+        return $instances;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public static function fetchFromGlobal(): array
     {
         global $wp_query;
@@ -267,7 +292,7 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     public static function is($instance): bool
     {
         return $instance instanceof static &&
-            ((($postType = static::$postType) && ($postType !== 'any')) ? $instance->typeIn($postType) : true);
+            (!(($postType = static::$postType) && ($postType !== 'any')) || $instance->typeIn($postType));
     }
 
     /**

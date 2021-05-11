@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pollen\WpPost;
 
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Pollen\Pagination\Adapters\WpQueryPaginatorInterface;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBagInterface;
@@ -61,6 +63,15 @@ interface WpPostQueryInterface extends ParamsBagInterface
     public static function create($id = null, ...$args): ?WpPostQueryInterface;
 
     /**
+     * Récupération d'une instance basée sur un modèle Laravel.
+     *
+     * @param EloquentModel $model
+     *
+     * @return static|null
+     */
+    public static function createFromEloquent(EloquentModel $model): ?WpPostQueryInterface;
+
+    /**
      * Récupération d'une instance basée sur le post global courant.
      *
      * @return static|null
@@ -112,6 +123,15 @@ interface WpPostQueryInterface extends ParamsBagInterface
      * @return array
      */
     public static function fetchFromArgs(array $args = []): array;
+
+    /**
+     * Récupération d'une liste d'instances basée sur un resultat de requête en base de données.
+     *
+     * @param EloquentCollection $collection
+     *
+     * @return array
+     */
+    public static function fetchFromEloquent(EloquentCollection $collection): array;
 
     /**
      * Récupération d'une liste d'instances basée sur la requête de récupération globale.
