@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Pollen\Pagination\Adapters\WpQueryPaginatorInterface;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBagInterface;
-use Pollen\WpTaxonomy\WpTermQueryInterface;
+use Pollen\WpTerm\WpTermQueryInterface;
 use Pollen\WpUser\WpUserQueryInterface;
 use WP_Post;
 use WP_Query;
@@ -397,7 +397,7 @@ interface WpPostQueryInterface extends ParamsBagInterface
     public function getName(): string;
 
     /**
-     * Récupération de l'instance tiFy du produit parent.
+     * Récupération de l'instance du produit parent.
      *
      * @return static|null
      */

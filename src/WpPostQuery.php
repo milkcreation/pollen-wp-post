@@ -12,7 +12,7 @@ use Pollen\Support\Arr;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBag;
 use Pollen\Support\Str;
-use Pollen\WpTaxonomy\WpTermQuery;
+use Pollen\WpTerm\WpTermQuery;
 use Pollen\WpUser\WpUserQuery;
 use Pollen\WpUser\WpUserQueryInterface;
 use WP_Post;
