@@ -12,6 +12,7 @@ use Pollen\Support\Arr;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBag;
 use Pollen\Support\Str;
+use Pollen\WpComment\WpCommentQuery;
 use Pollen\WpTerm\WpTermQuery;
 use Pollen\WpUser\WpUserQuery;
 use Pollen\WpUser\WpUserQueryInterface;
@@ -599,6 +600,21 @@ class WpPostQuery extends ParamsBag implements WpPostQueryInterface
     public function getQueriedAuthor(): ?WpUserQueryInterface
     {
         return WpUserQuery::createFromId($this->getAuthorId());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getQueriedComments(array $args = []): array
+    {
+        return WpCommentQuery::fetchFromArgs(
+            array_merge(
+                $args,
+                [
+                    'post_id' => $this->getId(),
+                ]
+            )
+        );
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Pollen\Pagination\Adapters\WpQueryPaginatorInterface;
 use Pollen\Support\DateTime;
 use Pollen\Support\ParamsBagInterface;
+use Pollen\WpComment\WpCommentQueryInterface;
 use Pollen\WpTerm\WpTermQueryInterface;
 use Pollen\WpUser\WpUserQueryInterface;
 use WP_Post;
@@ -430,6 +431,15 @@ interface WpPostQueryInterface extends ParamsBagInterface
      * @return WpUserQueryInterface|null
      */
     public function getQueriedAuthor(): ?WpUserQueryInterface;
+
+    /**
+     * Récupération de la liste des commentaires associés.
+
+     * @param array $args.
+     *
+     * @return WpCommentQueryInterface[]|array
+     */
+    public function getQueriedComments(array $args = []): array;
 
     /**
      * Récupération de l'instance de l'image représentative associée.
