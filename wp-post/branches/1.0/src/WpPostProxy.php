@@ -47,7 +47,7 @@ trait WpPostProxy
         }
 
         if (is_array($query) || ($query instanceof WP_Query)) {
-            return $this->wpPostManager->posts($query);
+            return $this->wpPostManager->fetch($query);
         }
 
         if ($query === true) {
