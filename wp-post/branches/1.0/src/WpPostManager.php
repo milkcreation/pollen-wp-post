@@ -9,6 +9,7 @@ use Pollen\Support\Concerns\BootableTrait;
 use Pollen\Support\Concerns\ConfigBagAwareTrait;
 use Pollen\Support\Exception\ManagerRuntimeException;
 use Pollen\Support\Proxy\ContainerProxy;
+use Pollen\WpKernel\Exception\WpRuntimeException;
 use Psr\Container\ContainerInterface as Container;
 use WP_Post_Type;
 
@@ -38,19 +39,19 @@ class WpPostManager implements WpPostManagerInterface
      */
     public function __construct(array $config = [], ?Container $container = null)
     {
+        if (!self::$instance instanceof static) {
+            self::$instance = $this;
+        } else {
+            return;
+        }
+
         $this->setConfig($config);
 
         if ($container !== null) {
             $this->setContainer($container);
         }
 
-        if ($this->config('boot_enabled', true)) {
-            $this->boot();
-        }
-
-        if (!self::$instance instanceof static) {
-            self::$instance = $this;
-        }
+        $this->boot();
     }
 
     /**
@@ -72,10 +73,16 @@ class WpPostManager implements WpPostManagerInterface
     public function boot(): WpPostManagerInterface
     {
         if (!$this->isBooted()) {
+            if (!function_exists('add_action')) {
+                throw new WpRuntimeException('add_action function is missing.');
+            }
+
             add_action('init', function () {
                 global $wp_post_types;
 
                 foreach ($this->postTypeManager()->all() as $name => $postType) {
+                    $postType->boot();
+
                     if (!isset($wp_post_types[$name])) {
                         register_post_type($name, $postType->params()->all());
                     }
