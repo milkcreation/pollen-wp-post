@@ -9,8 +9,8 @@ use Pollen\Support\Concerns\BootableTrait;
 use Pollen\Support\Concerns\ConfigBagAwareTrait;
 use Pollen\Support\Exception\ManagerRuntimeException;
 use Pollen\Support\Proxy\ContainerProxy;
-use Pollen\WpKernel\Exception\WpRuntimeException;
 use Psr\Container\ContainerInterface as Container;
+use RuntimeException;
 use WP_Post_Type;
 
 class WpPostManager implements WpPostManagerInterface
@@ -74,40 +74,50 @@ class WpPostManager implements WpPostManagerInterface
     {
         if (!$this->isBooted()) {
             if (!function_exists('add_action')) {
-                throw new WpRuntimeException('add_action function is missing.');
+                throw new RuntimeException('add_action function is missing.');
             }
 
-            add_action('init', function () {
-                global $wp_post_types;
+            add_action(
+                'init',
+                function () {
+                    global $wp_post_types;
 
-                foreach ($this->postTypeManager()->all() as $name => $postType) {
-                    $postType->boot();
+                    foreach ($this->postTypeManager()->all() as $name => $postType) {
+                        $postType->boot();
 
-                    if (!isset($wp_post_types[$name])) {
-                        register_post_type($name, $postType->params()->all());
-                    }
+                        if (!isset($wp_post_types[$name])) {
+                            register_post_type($name, $postType->params()->all());
+                        }
 
-                    if ($wp_post_types[$name] instanceof WP_Post_Type) {
-                        $postType->setWpPostType($wp_post_types[$name]);
-                    }
+                        if ($wp_post_types[$name] instanceof WP_Post_Type) {
+                            $postType->setWpPostType($wp_post_types[$name]);
+                        }
 
-                    if ($taxonomies = $postType->params('taxonomies', [])) {
-                        foreach ($taxonomies as $taxonomy) {
-                            register_taxonomy_for_object_type($taxonomy, $postType->getName());
+                        if ($taxonomies = $postType->params('taxonomies', [])) {
+                            foreach ($taxonomies as $taxonomy) {
+                                register_taxonomy_for_object_type($taxonomy, $postType->getName());
+                            }
                         }
                     }
-                }
-            }, 11);
+                },
+                11
+            );
 
-            add_action('init', function () {
-                global $wp_post_types;
+            add_action(
+                'init',
+                function () {
+                    global $wp_post_types;
 
-                foreach ($wp_post_types as $name => $attrs) {
-                    if (!$this->getType($name)) {
-                        $this->registerType($name, get_object_vars($attrs));
+                    foreach ($wp_post_types as $name => $attrs) {
+                        if (!$this->getType($name)
+                            && ($postType = $this->registerType($name, get_object_vars($attrs)))
+                        ) {
+                            $postType->boot();
+                        }
                     }
-                }
-            }, 999999);
+                },
+                999999
+            );
 
             $this->setBooted();
         }
