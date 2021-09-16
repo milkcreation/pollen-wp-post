@@ -1,26 +1,19 @@
 {
   "name": "pollen-solutions/wp-post",
   "description": "Pollen Wordpress Post Component.",
-  "homepage": "https://www.presstify.com/pollen-solutions/wp-post/",
+  "homepage": "https://github.com/milkcreation/pollen-wp-post.git",
   "keywords": [
     "pollen-solutions",
     "component",
     "wordpress",
     "post"
   ],
-  "time": "2021-06-09",
+  "time": "2021-09-15",
   "license": "MIT",
   "authors": [
     {
       "name": "Jordy Manner",
-      "email": "jordy@presstify.com",
-      "role": "Developper"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https://composer.presstify.com/pollen-solutions/"
+      "email": "jordy@presstify.com"
     }
   ],
   "require": {
